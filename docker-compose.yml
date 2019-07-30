@@ -1,0 +1,67 @@
+version: '3.3'
+
+services:
+  sugar-mysql:
+    container_name: sugar_mysql
+    image: mysql:5.7 # pull the mysql image with the tag 5.7 from docker hub
+    environment:
+      MYSQL_USER: devuser
+      MYSQL_PASSWORD: devpass
+      MYSQL_DATABASE: sugarcrm
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  sugar-elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+    container_name: sugar_elastic
+    ports:
+      - "9200:9200"
+
+  # The sugar files are mounted separately so you can scale better the web servers
+  sugar-mount:
+    container_name: sugar_mount
+    build: ./sugar-mount
+    volumes:
+      - sugar_mount:/sugar_mount
+
+  sugar-redis:
+    container_name: "sugar_redis"
+    image: redis:latest
+    volumes:
+      - ./data/redis:/data
+
+  sugar-server:
+    container_name: sugar_server
+    build: ./sugar-server
+    ports:
+      - "80:80"
+    env_file:
+      - ./sugar-server/config.env
+    volumes:
+      - sugar_mount:/var/www/html
+    depends_on:
+      - sugar-mount
+      - sugar-mysql
+      - sugar-elastic
+
+  sugar-cron:
+    container_name: "sugar_cron"
+    build: ./sugar-cron
+    volumes:
+      - sugar_mount:/var/www/html
+    depends_on:
+      - sugar-mysql
+      - sugar-elastic
+      - sugar-redis
+      - sugar-mount
+    links:
+      - sugar-mysql
+      - sugar-elastic
+      - sugar-redis
+
+volumes:
+  db-data:
+  sugar_mount:
