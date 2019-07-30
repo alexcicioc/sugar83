@@ -10,7 +10,7 @@ services:
       MYSQL_DATABASE: sugarcrm
       MYSQL_ROOT_PASSWORD: root
     volumes:
-      - db-data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
     ports:
       - "3306:3306"
 
@@ -31,7 +31,7 @@ services:
     container_name: "sugar_redis"
     image: redis:latest
     volumes:
-      - ./data/redis:/data
+      - redis-data:/data
 
   sugar-server:
     container_name: sugar_server
@@ -63,5 +63,6 @@ services:
       - sugar-redis
 
 volumes:
-  db-data:
+  mysql-data:
+  redis-data:
   sugar_mount:

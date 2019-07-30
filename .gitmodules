@@ -6,3 +6,6 @@
 	path = sugar-server
 	url = git@github.com:alexcicioc/sugar-server.git
 	branch = master
+[submodule "sugar-mount"]
+	path = sugar-mount
+	url = git@github.com:alexcicioc/sugar-mount.git
