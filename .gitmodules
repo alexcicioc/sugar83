@@ -1,9 +1,8 @@
-[submodule "sugar-mount"]
-	path = sugar-mount
-	url = git@bitbucket.org:alexandru_cicioc/sugar-mount.git
-[submodule "sugar-server"]
-	path = sugar-server
-	url = git@bitbucket.org:alexandru_cicioc/sugar-server.git
 [submodule "sugar-cron"]
 	path = sugar-cron
-	url = git@bitbucket.org:alexandru_cicioc/sugar-cron.git
+	url = git@github.com:alexcicioc/sugar-cron.git
+	branch = master
+[submodule "sugar-server"]
+	path = sugar-server
+	url = git@github.com:alexcicioc/sugar-server.git
+	branch = master
