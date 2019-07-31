@@ -9,3 +9,5 @@
 [submodule "sugar-mount"]
 	path = sugar-mount
 	url = git@github.com:alexcicioc/sugar-mount.git
+	branch = master
+
