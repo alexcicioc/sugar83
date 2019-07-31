@@ -1,6 +1,46 @@
 version: '3.3'
 
 services:
+  # The sugar files are mounted separately so you can scale better the web servers
+  sugar-mount:
+    container_name: sugar_mount
+    build: ./sugar-mount
+    environment:
+      APACHE_RUN_USER: sugar
+    volumes:
+      - sugar_mount:/sugar_mount
+
+  sugar-server:
+    container_name: sugar_server
+    build: ./sugar-server
+    ports:
+      - "80:80"
+    env_file:
+      - ./config.env
+    volumes:
+      - sugar_mount:/var/www/html
+    depends_on:
+      - sugar-mount
+      - sugar-mysql
+      - sugar-elastic
+
+  sugar-cron:
+    container_name: "sugar_cron"
+    build: ./sugar-cron
+    env_file:
+      - ./config.env
+    volumes:
+      - sugar_mount:/var/www/html
+    depends_on:
+      - sugar-mysql
+      - sugar-elastic
+      - sugar-redis
+      - sugar-mount
+    links:
+      - sugar-mysql
+      - sugar-elastic
+      - sugar-redis
+
   sugar-mysql:
     container_name: sugar_mysql
     image: mysql:5.7 # pull the mysql image with the tag 5.7 from docker hub
@@ -20,47 +60,11 @@ services:
     ports:
       - "9200:9200"
 
-  # The sugar files are mounted separately so you can scale better the web servers
-  sugar-mount:
-    container_name: sugar_mount
-    build: ./sugar-mount
-    volumes:
-      - sugar_mount:/sugar_mount
-
   sugar-redis:
     container_name: "sugar_redis"
     image: redis:latest
     volumes:
       - redis-data:/data
-
-  sugar-server:
-    container_name: sugar_server
-    build: ./sugar-server
-    ports:
-      - "80:80"
-    env_file:
-      - ./sugar-server/config.env
-    volumes:
-      - sugar_mount:/var/www/html
-    depends_on:
-      - sugar-mount
-      - sugar-mysql
-      - sugar-elastic
-
-  sugar-cron:
-    container_name: "sugar_cron"
-    build: ./sugar-cron
-    volumes:
-      - sugar_mount:/var/www/html
-    depends_on:
-      - sugar-mysql
-      - sugar-elastic
-      - sugar-redis
-      - sugar-mount
-    links:
-      - sugar-mysql
-      - sugar-elastic
-      - sugar-redis
 
 volumes:
   mysql-data:
